@@ -1,0 +1,10 @@
+When server initiating , server is not getting connected . 
+
+Caused by: java.net.BindException: Address already in use
+
+Remedy : 
+
+lsof -i :9092 get the all PID numbers and Kill all PIDs . 
+
+kill -9 <PIDNUMBER>
+
