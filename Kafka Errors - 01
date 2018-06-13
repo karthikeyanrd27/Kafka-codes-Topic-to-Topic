@@ -1,0 +1,14 @@
+Error : java.net.BindException: Address already in use in kafka
+Solution  :
+  ps -ef|grep zookeeper
+  get the pids and kill it 
+kill -9  56139
+kill -9  55898
+kill -9 65271
+kill -9 56620
+kill -9 57902
+kill -9 56860
+kill -9 58631
+kill -9 62489
+kill -9 59422
+kill -9 61468
