@@ -1,0 +1,6 @@
+
+Error : 
+java.lang.OutOfMemoryError: Java heap space
+
+Solution : 
+export KAFKA_HEAP_OPTS="-Xms2G -Xmx2G"
