@@ -1,0 +1,20 @@
+from kafka import KafkaConsumer
+import avro.schema
+import avro.io
+import io
+
+# To consume messages
+consumer = KafkaConsumer('test',
+                         group_id='test-consumer-group',
+                         bootstrap_servers=['localhost:9092'])
+
+schema_path="/Users/KarthikeyanDurairaj/Desktop/AvroFileschema.txt"
+schema = avro.schema.Parse(open(schema_path).read())
+
+for msg in consumer:
+    bytes_reader = io.BytesIO(msg.value)
+    decoder = avro.io.BinaryDecoder(bytes_reader)
+    reader = avro.io.DatumReader(schema)
+    user1 = reader.read(decoder)
+    print (user1)
+~                
