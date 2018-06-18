@@ -1,0 +1,2 @@
+: org.apache.spark.SparkException: java.nio.channels.ClosedChannelException
+Topic is not present
