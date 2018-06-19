@@ -1,0 +1,8 @@
+Error Message : Address already in use: Service 'SparkUI' failed after 16 retries
+Solutions : 
+
+Finding the running PORT and kill it . 
+
+ netstat -vanp tcp | grep 4040
+ 
+ 
