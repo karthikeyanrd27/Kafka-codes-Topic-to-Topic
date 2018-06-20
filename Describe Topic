@@ -1,0 +1,1 @@
+bin/kafka-topics.sh --describe --zookeeper ushapld00119la:2181/kafka --topic NBC_APPS.TBL_MS_PLAN_WK
