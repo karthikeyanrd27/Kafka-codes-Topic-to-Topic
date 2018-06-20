@@ -1,0 +1,1 @@
+bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list ushapld00119la:9092 --topic NBC_APPS.TBL_MS_PLAN_LA --time -1 --offsets 1 | awk -F ':' '{sum += $3} END {print sum}'
