@@ -1,0 +1,3 @@
+bin/kafka-topics.sh --describe --zookeeper ushapld00119la:2181/kafka --topic NBC_APPS.TBL_MS_PLAN_WK
+
+bin/kafka-topics.sh --zookeeper ushapld00119la:2181/kafka  --alter --topic NBC_APPS.TBL_MS_PLAN_WK --config retention.ms=86400000
