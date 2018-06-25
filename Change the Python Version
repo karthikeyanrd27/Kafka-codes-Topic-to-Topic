@@ -1,0 +1,10 @@
+Get the Python location 
+which -a python2.7
+
+Chane the Envriomental Variable :
+
+xport PYSPARK_PYTHON=/Users/KarthikeyanDurairaj/anaconda3/lib/python3.6
+export PYSPARK_DRIVER_PYTHON=/Users/KarthikeyanDurairaj/anaconda3/lib/python3.6
+
+Execute the pyspark Terminal : 
+bin/pyspark 
