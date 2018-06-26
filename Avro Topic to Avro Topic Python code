@@ -1,0 +1,39 @@
+from pyspark import SparkConf, SparkContext
+from operator import add
+import sys
+from pyspark.streaming import StreamingContext
+from pyspark.streaming.kafka import KafkaUtils
+import json
+from kafka import SimpleProducer, KafkaClient
+from kafka import KafkaProducer
+from pyspark.streaming.kafka import KafkaUtils, OffsetRange, TopicAndPartition
+import abc, six
+import avro.schema
+from confluent_kafka.avro.cached_schema_registry_client import CachedSchemaRegistryClient
+from confluent_kafka.avro.serializer.message_serializer import MessageSerializer
+
+producer = KafkaProducer(bootstrap_servers='localhost:9092')
+
+TOPIC = 'NBC_APPS.TBL_MS_ADVERTISER'
+PARTITION = 0
+topicAndPartition = TopicAndPartition(TOPIC, PARTITION)
+fromOffsets1 = {topicAndPartition:int(PARTITION)}
+
+
+def handler(message):
+    records = message.collect()
+    for record in records:
+        value_all=record[1]
+        value_key=record[0]
+        producer.send('NBCU', json.dumps(record).encode('utf-8'))
+        producer.flush()
+
+schema_registry_client = CachedSchemaRegistryClient(url='http://ushapld00119la:8081')
+serializer = MessageSerializer(schema_registry_client)
+sc = SparkContext(appName="PythonStreamingAvro")
+ssc = StreamingContext(sc, 30)
+kvs = KafkaUtils.createDirectStream(ssc, ['NBC_APPS.TBL_MS_ADVERTISER'], {"metadata.broker.list": 'ushapld00119la:9092'},valueDecoder=serializer.decode_message)
+kvs.foreachRDD(handler)
+
+ssc.start()
+ssc.awaitTermination()
