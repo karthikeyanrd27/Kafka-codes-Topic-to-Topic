@@ -1,0 +1,3 @@
+Command to Find Kafka Version 
+
+find ./libs/ -name \*kafka_\* | head -1 | grep -o '\kafka[^\n]*'
