@@ -1,0 +1,7 @@
+
+Error: 
+Cannot start Kafka, Zookeeper is not running. Check your deployment
+
+ps aux|grep zookeeper
+
+Kill PID and start again 
