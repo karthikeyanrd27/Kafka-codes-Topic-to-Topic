@@ -1,0 +1,3 @@
+
+Command to kill all PIDs which are related to Confluent
+ps -ef|grep confluent.|grep -v grep|awk '{print $2}'|xargs -Ifoo kill -9 foo
