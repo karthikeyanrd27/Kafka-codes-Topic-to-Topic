@@ -1,0 +1,7 @@
+
+Confluent Commands: 
+
+1. Start all Services : 
+bin/confluent start 
+2. Check the status of all Services : 
+bin/confluent status 
