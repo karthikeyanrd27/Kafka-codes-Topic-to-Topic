@@ -7,3 +7,14 @@ Solutions:
 
 just delete directory /tmp/kafka-logs and try again
 
+
+
+Address 9092 already being used : 
+
+lsof -i tcp:9092
+ 
+ 
+ Get the PID and delete it execute it again . 
+
+
+
