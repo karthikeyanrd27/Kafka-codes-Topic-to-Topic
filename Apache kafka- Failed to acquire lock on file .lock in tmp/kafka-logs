@@ -1,0 +1,8 @@
+Error : 
+
+Apache kafka: Failed to acquire lock on file .lock in tmp/kafka-logs
+
+Solutions : 
+
+just delete directory /tmp/kafka-logs and try again
+
