@@ -1,0 +1,9 @@
+
+
+1. Joining table and streams : 
+
+https://stackoverflow.com/questions/50102662/confluent-4-1-0-ksql-stream-table-join-table-data-null/50103660#50103660
+
+2. CTAS in KSQL 
+
+https://github.com/confluentinc/ksql/issues/1557
