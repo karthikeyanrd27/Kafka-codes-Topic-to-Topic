@@ -1,0 +1,158 @@
+#****************************************************************
+#  Pyspark Based stucrured Streaming code
+#        Created By Karthikeyan Rasipalayam Durairaj
+#         Ajay T on 11/13/2019
+#*****************************************************************
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+from pyspark.sql.types import *
+from pyspark.streaming import StreamingContext
+from pyspark.sql.column import Column, _to_java_column
+from pyspark.sql.functions import col, struct
+from pyspark.sql.functions import udf
+import json
+import csv
+import time
+import os
+
+#  Spark Streaming context :
+
+spark = SparkSession.builder.appName('pda_inst_monitor_status_update').getOrCreate()
+sc = spark.sparkContext
+ssc = StreamingContext(sc, 20)
+
+#  Kafka Topic Details :
+
+KAFKA_TOPIC_NAME_CONS = "inst_monitor_status"
+KAFKA_OUTPUT_TOPIC_NAME_CONS = "inst_monitor_status_to_hdfs"
+KAFKA_BOOTSTRAP_SERVERS_CONS = 'dvtcbddd3001.corp.cox.com:9093'
+
+#  Creating  readstream DataFrame :
+
+df = spark.readStream \
+     .format("kafka") \
+     .option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP_SERVERS_CONS) \
+     .option("subscribe", KAFKA_TOPIC_NAME_CONS) \
+     .option("startingOffsets", "latest") \
+     .option("failOnDataLoss" ,"false")\
+     .option("kafka.security.protocol","SASL_SSL")\
+     .option("kafka.client.id" ,"MCI-CIL")\
+     .option("kafka.sasl.kerberos.service.name","kafka")\
+     .option("kafka.ssl.truststore.location", "/home/bdpda/pda/kafka_trust.jks") \
+     .option("kafka.ssl.truststore.password", "changeit") \
+     .option("kafka.sasl.kerberos.keytab","/home/bdpda/bdpda.headless.keytab") \
+     .option("kafka.sasl.kerberos.principal","bdpda") \
+     .load()
+
+df1 = df.selectExpr( "CAST(value AS STRING)")
+
+df1.registerTempTable("test")
+
+
+def json_formatted(s):
+    val_dict = json.loads(s)
+    return str([
+                    val_dict["after"]["ID"]
+                ,   val_dict["after"]["INST_NAME"]
+                ,   val_dict["after"]["DB_UNIQUE_NAME"]
+                ,   val_dict["after"]["DBNAME"]
+                ,   val_dict["after"]["MON_START_TIME"]
+                ,   val_dict["after"]["MON_END_TIME"]
+                ,   val_dict["after"]["MON_ELA_TIME_MS"]
+                ,   val_dict["after"]["MON_ELA_TIME_SEC"]
+                ,   val_dict["after"]["MON_RESULT_CODE"]
+                ,   val_dict["after"]["MON_ERR_CODE"]
+                ,   val_dict["after"]["MON_RESULT_MSG"]
+                ,   val_dict["after"]["MAINT_CODE"]
+                ,   val_dict["after"]["MAINT_REASON"]
+                ,   val_dict["after"]["INST_ID"]
+                ,   val_dict["after"]["DBID"]
+                ,   val_dict["after"]["HOST_NAME"]
+                ,   val_dict["after"]["VERSION"]
+                ,   val_dict["after"]["STARTUP_TIME"]
+                ,   val_dict["after"]["STATUS"]
+                ,   val_dict["after"]["CLUSTERED"]
+                ,   val_dict["after"]["ARCHIVER"]
+                ,   val_dict["after"]["DB_STATUS"]
+                ,   val_dict["after"]["DATABASE_ROLE"]
+                ,   val_dict["after"]["CREATED"]
+                ,   val_dict["after"]["LOG_MODE"]
+                ,   val_dict["after"]["PROTECTION_MODE"]
+                ,   val_dict["after"]["PLATFORM_NAME"]
+                ,   val_dict["after"]["MAX_PROCESS"]
+                ,   val_dict["after"]["CURR_PROCESS"]
+                ,   val_dict["after"]["MAX_SESSIONS"]
+                ,   val_dict["after"]["CURR_SESSIONS"]
+                ,   val_dict["after"]["CURR_ACTIVE_CNT"]
+                ,   val_dict["after"]["MAX_PARALLEL"]
+                ,   val_dict["after"]["PARALLEL_IN_USE"]
+                ,   val_dict["after"]["PARALLEL_SERVERS_TARGET"]
+                ,   val_dict["after"]["AUTO_DOP"]
+                ,   val_dict["after"]["SQL_QUEUED"]
+                ,   val_dict["after"]["SQL_SERIALIZED"]
+                ,   val_dict["after"]["SQL_DOWNGRADED"]
+                ,   val_dict["after"]["HOST_CPU_USED_PCT"]
+                ,   val_dict["after"]["HOST_CPU_LOAD"]
+                ,   val_dict["after"]["IOPS"]
+                ,   val_dict["after"]["IO_MBPS"]
+                ,   val_dict["after"]["IO_WAIT_TIME_MS"]
+                ,   val_dict["after"]["TNS_ALIAS"]
+                ,   val_dict["after"]["STALE_SESSIONS_OT_4HRS"]
+                ,   val_dict["after"]["STALE_SESSIONS_OT_24HRS"]
+                ,   val_dict["after"]["FLASHBACK_ON"]
+                ,   val_dict["after"]["SGA_USED_MB"]
+                ,   val_dict["after"]["SGA_USED_PCT"]
+                ,   val_dict["after"]["PGA_USED_MB"]
+                ,   val_dict["after"]["PGA_USED_PCT"]
+                ,   val_dict["after"]["CDB"]
+                ,   val_dict["after"]["USER_TXNS_PER_SEC"]
+                ,   val_dict["after"]["USER_CALLS_PER_SEC"]
+                ,   val_dict["after"]["USER_CALLS_PER_TXN"]
+                ,   val_dict["after"]["PDB_NAME"]
+                ,   val_dict["after"]["SQL_RESPONSE_TIME_MS"]
+                ,   val_dict["after"]["TOP_1_SQL_ID"]
+                ,   val_dict["after"]["TOP_1_SQL_USER"]
+                ,   val_dict["after"]["TOP_1_SQL_OPNAME"]
+                ,   val_dict["after"]["TOP_1_SQL_ACTIVITY_PCT"]
+                ,   val_dict["after"]["TOP_2_SQL_ID"]
+                ,   val_dict["after"]["TOP_2_SQL_USER"]
+                ,   val_dict["after"]["TOP_2_SQL_OPNAME"]
+                ,   val_dict["after"]["TOP_2_SQL_ACTIVITY_PCT"]
+                ,   val_dict["after"]["TOP_3_SQL_ID"]
+                ,   val_dict["after"]["TOP_3_SQL_USER"]
+                ,   val_dict["after"]["TOP_3_SQL_OPNAME"]
+                ,   val_dict["after"]["TOP_3_SQL_ACTIVITY_PCT"]
+                ,   val_dict["after"]["TOP_4_SQL_ID"]
+                ,   val_dict["after"]["TOP_4_SQL_USER"]
+                ,   val_dict["after"]["TOP_4_SQL_OPNAME"]
+                ,   val_dict["after"]["TOP_4_SQL_ACTIVITY_PCT"]
+                ,   val_dict["after"]["TOP_5_SQL_ID"]
+                ,   val_dict["after"]["TOP_5_SQL_USER"]
+                ,   val_dict["after"]["TOP_5_SQL_OPNAME"]
+                ,   val_dict["after"]["TOP_5_SQL_ACTIVITY_PCT"]
+                ,   val_dict["after"]["BLOCKED_SESSIONS_COUNT"]
+                ,   val_dict["after"]["BLOCKING_SESSIONS_COUNT"]
+]).strip('[]').replace("'","").replace('"','')
+
+spark.udf.register("JsonformatterWithPython", json_formatted)
+
+squared_udf = udf(json_formatted)
+df1 = spark.table("test")
+df2 = df1.select(squared_udf("value"))
+
+
+
+#  Declaring the Readstream Schema DataFrame :
+
+df2.coalesce(1).writeStream \
+   .format("csv") \
+   .option("checkpointLocation","/user/bdpda/pda/coxstream/chk31") \
+   .outputMode("append") \
+   .start("/user/bdpda/pda/coxstream/tgt31")
+
+
+ssc.awaitTermination()
+
+SUBMIT : 
+
+/usr/hdp/2.6.1.0-129/spark2/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.2.0,com.databricks:spark-avro_2.11:3.2.0  --conf spark.ui.port=4055 --files /home/bdpda/spark_jaas,/home/bdpda/bdpda.headless.keytab --conf "spark.executor.extraJavaOptions=-Djava.security.auth.login.config=/home/bdpda/spark_jaas" --conf "spark.driver.extraJavaOptions=-Djava.security.auth.login.config=/home/bdpda/spark_jaas" pysparkstructurestreaming.py
